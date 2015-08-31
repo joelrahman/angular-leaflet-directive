@@ -364,9 +364,10 @@ angular.module("leaflet-directive")
             createLayer: function (params) {
                 if (params.layer instanceof L.Class) {
                     return angular.copy(params.layer);
-                }
-                else {
-                    $log.error('[AngularJS - Leaflet] A custom layer must be a leaflet Class');
+                } else if(params.layer instanceof Function) {
+                    return params.layer(params);
+                } else {
+                    $log.error('[AngularJS - Leaflet] A custom layer must be a leaflet Class or a factory function.');
                 }
             }
         },
