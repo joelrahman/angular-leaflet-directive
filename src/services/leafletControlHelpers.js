@@ -145,7 +145,7 @@ angular.module("leaflet-directive").factory('leafletControlHelpers', function ($
         layersControlMustBeVisible: _controlLayersMustBeVisible,
 
         isValidControlType: function(type) {
-            return Object.keys(controlTypes).indexOf(type) !== -1;
+            return (Object.keys(controlTypes).indexOf(type) !== -1)||(type==='custom');
         },
 
         createControl: function (type, params) {
