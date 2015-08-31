@@ -40,6 +40,10 @@ angular.module("leaflet-directive").factory('leafletLegendHelpers', function () 
 	var _getOnAddArrayLegend = function(legend, legendClass) {
 		return function(/*map*/) {
 			var div = L.DomUtil.create('div', legendClass);
+            if(legend.title) 
+              div.innerHTML += '<strong>'+legend.title+'</strong>';
+            if(legend.titleHTML) 
+              div.innerHTML += legend.titleHTML;
             for (var i = 0; i < legend.colors.length; i++) {
                 div.innerHTML +=
                     '<div class="outline"><i style="background:' + legend.colors[i] + '"></i></div>' +
