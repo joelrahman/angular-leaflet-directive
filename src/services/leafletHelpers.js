@@ -1,4 +1,4 @@
-angular.module("leaflet-directive").factory('leafletHelpers', function ($q, $log) {
+angular.module("leaflet-directive").service('leafletHelpers', function ($q, $log) {
     var _errorHeader = '[AngularJS - Leaflet] ';
     var _copy = angular.copy;
     var _clone = _copy;
@@ -100,7 +100,45 @@ angular.module("leaflet-directive").factory('leafletHelpers', function ($q, $log
         return !_isDefined(value);
     };
 
+    // BEGIN DIRECT PORT FROM AngularJS code base
+
+    var SPECIAL_CHARS_REGEXP = /([\:\-\_]+(.))/g;
+
+    var MOZ_HACK_REGEXP = /^moz([A-Z])/;
+
+    var PREFIX_REGEXP = /^((?:x|data)[\:\-_])/i;
+
+    /**
+    Converts snake_case to camelCase.
+    Also there is special case for Moz prefix starting with upper case letter.
+    @param name Name to normalize
+     */
+
+    var camelCase = function(name) {
+      return name.replace(SPECIAL_CHARS_REGEXP, function(_, separator, letter, offset) {
+        if (offset) {
+          return letter.toUpperCase();
+        } else {
+          return letter;
+        }
+      }).replace(MOZ_HACK_REGEXP, "Moz$1");
+    };
+
+
+    /**
+    Converts all accepted directives format into proper directive name.
+    @param name Name to normalize
+     */
+
+     var directiveNormalize = function(name) {
+      return camelCase(name.replace(PREFIX_REGEXP, ""));
+    };
+
+    // END AngularJS port
+
     return {
+        camelCase: camelCase,
+        directiveNormalize: directiveNormalize,
         copy:_copy,
         clone:_clone,
         errorHeader: _errorHeader,
@@ -215,6 +253,29 @@ angular.module("leaflet-directive").factory('leafletHelpers', function ($q, $log
             is: function(icon) {
                 if (this.isLoaded()) {
                     return icon instanceof L.AwesomeMarkers.Icon;
+                } else {
+                    return false;
+                }
+            },
+            equal: function (iconA, iconB) {
+                if (!this.isLoaded()) {
+                    return false;
+                }
+                if (this.is(iconA)) {
+                    return angular.equals(iconA, iconB);
+                } else {
+                    return false;
+                }
+            }
+        },
+
+        VectorMarkersPlugin: {
+            isLoaded: function() {
+                return angular.isDefined(L.VectorMarkers) && angular.isDefined(L.VectorMarkers.Icon);
+            },
+            is: function(icon) {
+                if (this.isLoaded()) {
+                    return icon instanceof L.VectorMarkers.Icon;
                 } else {
                     return false;
                 }
@@ -373,6 +434,18 @@ angular.module("leaflet-directive").factory('leafletHelpers', function ($q, $log
                 }
             }
         },
+        LeafletProviderPlugin: {
+            isLoaded: function() {
+                return angular.isDefined(L.TileLayer.Provider);
+            },
+            is: function(layer) {
+                if (this.isLoaded()) {
+                    return layer instanceof L.TileLayer.Provider;
+                } else {
+                    return false;
+                }
+            }
+        },          
         ChinaLayerPlugin: {
             isLoaded: function() {
                 return angular.isDefined(L.tileLayer.chinaProvider);

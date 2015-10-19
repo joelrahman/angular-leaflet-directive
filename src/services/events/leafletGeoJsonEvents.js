@@ -1,12 +1,9 @@
 angular.module("leaflet-directive")
-.factory('leafletGeoJsonEvents', function ($rootScope, $q, $log, leafletHelpers,
-  leafletEventsHelpersFactory, leafletLabelEvents, leafletData) {
+.factory('leafletGeoJsonEvents', function ($rootScope, $q, leafletLogger, leafletHelpers,
+  leafletEventsHelpersFactory, leafletData) {
     var safeApply = leafletHelpers.safeApply,
-        isDefined = leafletHelpers.isDefined,
-        Helpers = leafletHelpers,
-        lblHelp = leafletLabelEvents,
         EventsHelper = leafletEventsHelpersFactory;
-
+        // $log = leafletLogger;
 
     var GeoJsonEvents = function(){
       EventsHelper.call(this,'leafletDirectiveGeoJson', 'geojson');
@@ -14,9 +11,8 @@ angular.module("leaflet-directive")
 
     GeoJsonEvents.prototype =  new EventsHelper();
 
-
-    GeoJsonEvents.prototype.genDispatchEvent = function(eventName, logic, leafletScope, lObject, name, model, layerName, extra) {
-        var base = EventsHelper.prototype.genDispatchEvent.call(this, eventName, logic, leafletScope, lObject, name, model, layerName),
+    GeoJsonEvents.prototype.genDispatchEvent = function(maybeMapId, eventName, logic, leafletScope, lObject, name, model, layerName, extra) {
+        var base = EventsHelper.prototype.genDispatchEvent.call(this, maybeMapId, eventName, logic, leafletScope, lObject, name, model, layerName),
         _this = this;
 
         return function(e){

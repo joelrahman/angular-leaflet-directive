@@ -1,10 +1,11 @@
-angular.module("leaflet-directive", []).directive('leaflet',
-    function ($q, leafletData, leafletMapDefaults, leafletHelpers, leafletEvents) {
+angular.module("leaflet-directive", ['nemLogging']).directive('leaflet',
+    function ($q, leafletData, leafletMapDefaults, leafletHelpers, leafletMapEvents) {
     return {
         restrict: "EA",
         replace: true,
         scope: {
             center         : '=',
+            lfCenter       : '=',
             defaults       : '=',
             maxbounds      : '=',
             bounds         : '=',
@@ -35,9 +36,9 @@ angular.module("leaflet-directive", []).directive('leaflet',
 
         link: function(scope, element, attrs, ctrl) {
             var isDefined = leafletHelpers.isDefined,
-                defaults = leafletMapDefaults.setDefaults(scope.defaults, attrs.id),
-                mapEvents = leafletEvents.getAvailableMapEvents(),
-                addEvents = leafletEvents.addEvents;
+                defaults  = leafletMapDefaults.setDefaults(scope.defaults, attrs.id),
+                mapEvents = leafletMapEvents.getAvailableMapEvents(),
+                addEvents = leafletMapEvents.addEvents;
 
             scope.mapId =  attrs.id;
             leafletData.setDirectiveControls({}, attrs.id);
@@ -93,7 +94,7 @@ angular.module("leaflet-directive", []).directive('leaflet',
             var map = new L.Map(element[0], leafletMapDefaults.getMapCreationDefaults(attrs.id));
             ctrl._leafletMap.resolve(map);
 
-            if (!isDefined(attrs.center)) {
+            if (!isDefined(attrs.center) && !isDefined(attrs.lfCenter)) {
                 map.setView([defaults.center.lat, defaults.center.lng], defaults.center.zoom);
             }
 

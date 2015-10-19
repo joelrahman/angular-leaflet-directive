@@ -3,7 +3,8 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../bower_components/angular/angular.js"></script>
-    <script src="../bower_components/leaflet/dist/leaflet-src.js"></script>
+    <script src="../bower_components/leaflet/dist/leaflet.js"></script>
+    <script src="../bower_components/angular-simple-logger/dist/angular-simple-logger.js"></script>
     <script src="../dist/angular-leaflet-directive.js"></script>
     <link rel="stylesheet" href="../bower_components/leaflet/dist/leaflet.css" />
     <style media="screen" type="text/css">
@@ -67,7 +68,7 @@
     </script>
   </head>
   <body ng-controller="MarkersAngularTemplateController">
-      <leaflet center="london" markers="data.markers" height="480px" width="100%"></leaflet>
+      <leaflet lf-center="london" markers="data.markers" height="480px" width="100%"></leaflet>
       <h1>Markers angular template example</h1>
       <button ng-click="removeMarkers()">Remove markers</button>
       <button ng-click="addMarkers()">Add markers</button>

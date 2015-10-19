@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../bower_components/angular/angular.min.js"></script>
     <script src="../bower_components/leaflet/dist/leaflet.js"></script>
+    <script src="../bower_components/angular-simple-logger/dist/angular-simple-logger.js"></script>
     <script src="../bower_components/leaflet-plugins/layer/Marker.Rotate.js"></script>
     <script src="../dist/angular-leaflet-directive.min.js"></script>
     <link rel="stylesheet" href="../bower_components/leaflet/dist/leaflet.css" />
@@ -53,7 +54,7 @@
     </script>
   </head>
   <body ng-controller="MarkersRotationController">
-      <leaflet center="chicago" markers="markers" height="480px" width="100%"></leaflet>
+      <leaflet lf-center="chicago" markers="markers" height="480px" width="100%"></leaflet>
       <h1>Changing Icon Rotation</h1>
     </div>
   </body>

@@ -19,8 +19,10 @@ module.exports = function(karma) {
         files: [
             'bower_components/leaflet/dist/leaflet-src.js',
             'bower_components/angular/angular.js',
-            'bower_components/leaflet.markercluster/dist/leaflet.markercluster.js',
             'bower_components/angular-mocks/angular-mocks.js',
+            'bower_components/angular-simple-logger/dist/angular-simple-logger.js',//THIS IS BROWSER version
+            'bower_components/leaflet.markercluster/dist/leaflet.markercluster.js',
+            'bower_components/leaflet.vector-markers/dist/Leaflet.vector-markers.js',
             'dist/angular-leaflet-directive_dev_mapped.js',
             'test/unit/bootstrap.coffee',
             'test/unit/*.js',

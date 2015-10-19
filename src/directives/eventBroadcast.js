@@ -1,4 +1,5 @@
-angular.module("leaflet-directive").directive('eventBroadcast', function ($log, $rootScope, leafletHelpers, leafletEvents, leafletIterators) {
+angular.module("leaflet-directive").directive('eventBroadcast', function (leafletLogger, $rootScope, leafletHelpers, leafletMapEvents, leafletIterators) {
+    var $log = leafletLogger;
     return {
         restrict: "A",
         scope: false,
@@ -10,8 +11,8 @@ angular.module("leaflet-directive").directive('eventBroadcast', function ($log, 
                 isDefined = leafletHelpers.isDefined,
                 leafletScope  = controller.getLeafletScope(),
                 eventBroadcast = leafletScope.eventBroadcast,
-                availableMapEvents = leafletEvents.getAvailableMapEvents(),
-                addEvents = leafletEvents.addEvents;
+                availableMapEvents = leafletMapEvents.getAvailableMapEvents(),
+                addEvents = leafletMapEvents.addEvents;
 
             controller.getMap().then(function(map) {
 

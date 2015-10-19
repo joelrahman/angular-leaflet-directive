@@ -1,8 +1,9 @@
-angular.module("leaflet-directive").service('leafletMarkersHelpers', function ($rootScope, $timeout, leafletHelpers, $log, $compile, leafletGeoJsonHelpers) {
+angular.module("leaflet-directive").service('leafletMarkersHelpers', function ($rootScope, $timeout, leafletHelpers, leafletLogger, $compile, leafletGeoJsonHelpers) {
     var isDefined = leafletHelpers.isDefined,
         defaultTo = leafletHelpers.defaultTo,
         MarkerClusterPlugin = leafletHelpers.MarkerClusterPlugin,
         AwesomeMarkersPlugin = leafletHelpers.AwesomeMarkersPlugin,
+        VectorMarkersPlugin = leafletHelpers.VectorMarkersPlugin,
         MakiMarkersPlugin = leafletHelpers.MakiMarkersPlugin,
         ExtraMarkersPlugin = leafletHelpers.ExtraMarkersPlugin,
         DomMarkersPlugin = leafletHelpers.DomMarkersPlugin,
@@ -13,7 +14,8 @@ angular.module("leaflet-directive").service('leafletMarkersHelpers', function ($
         isObject = leafletHelpers.isObject,
         groups = {},
         geoHlp = leafletGeoJsonHelpers,
-        errorHeader = leafletHelpers.errorHeader;
+        errorHeader = leafletHelpers.errorHeader,
+        $log = leafletLogger;
 
 
     var _string = function (marker) {
@@ -36,6 +38,14 @@ angular.module("leaflet-directive").service('leafletMarkersHelpers', function ($
             }
 
             return new L.AwesomeMarkers.icon(iconData);
+        }
+
+        if (isDefined(iconData) && isDefined(iconData.type) && iconData.type === 'vectorMarker') {
+            if (!VectorMarkersPlugin.isLoaded()) {
+                $log.error(errorHeader + ' The VectorMarkers Plugin is not loaded.');
+            }
+
+            return new L.VectorMarkers.icon(iconData);
         }
 
         if (isDefined(iconData) && isDefined(iconData.type) && iconData.type === 'makiMarker') {

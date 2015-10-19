@@ -1,3 +1,41 @@
+<a name"0.9.0"></a>
+### 0.9.0 (2015-10-12)
+
+#### Breaking changes
+
+* **events:** refactor(rootScope map events): If the id attribute is set for the leaflet directive then the id will be used in the rootScope leaflet events. Example: `<leaflet id="firstMap">`, Will fire  `leafletDirectiveMap.firstMap.click` ([d22b3f0](https://github.com/tombatossals/angular-leaflet-directive/commit/d22b3f0))
+
+#### Bug Fixes
+
+* **build:** Added "core" to .gitignore to avoid more "core" files inside distributed version ([2ff48c3e](https://github.com/tombatossals/angular-leaflet-directive/commit/2ff48c3e))
+
+#### Features
+
+* **Leaflet.vector-markers:** Add support for Leaflet plugin 'Leaflet.vector-markers' ([eb386a1](https://github.com/tombatossals/angular-leaflet-directive/commit/eb386a1))
+* **Nokia Maps:** Added Nokia here maps. ([83b71ef](https://github.com/tombatossals/angular-leaflet-directive/commit/83b71ef))
+
+<a name"0.8.8"></a>
+### 0.8.8 (2015-09-04)
+
+
+#### Bug Fixes
+
+* **center:**
+  * Fix bug with scope.center via @ageblade ([7e718c5f](https://github.com/tombatossals/angular-leaflet-directive/commit/7e718c5f))
+  * Fix bug with scope.center ([277ebc58](https://github.com/tombatossals/angular-leaflet-directive/commit/277ebc58))
+
+
+#### Features
+
+* **layers:** Add support for Leaflet.TileLayer.IIP ([ec0fe740](https://github.com/tombatossals/angular-leaflet-directive/commit/ec0fe740))
+* **lf-center:** lfCenter or 'lf-center' added which is a dupe of center. center to be deprecated ([06b5a3fa](https://github.com/tombatossals/angular-leaflet-directive/commit/06b5a3fa))
+
+
+#### Breaking changes
+
+* **logger:** Add new independent logger requirement to replace Angular $log. Remember to include angular-simple-logger before Angular-Leaflet from your bower assets. ([4f35bf6](https://github.com/tombatossals/angular-leaflet-directive/commit/4f35bf6))
+
+
 <a name"0.8.7"></a>
 ### 0.8.7 (2015-08-26)
 

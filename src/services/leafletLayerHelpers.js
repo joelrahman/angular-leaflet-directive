@@ -1,5 +1,5 @@
 angular.module("leaflet-directive")
-.factory('leafletLayerHelpers', function ($rootScope, $log, leafletHelpers, leafletIterators) {
+.factory('leafletLayerHelpers', function ($rootScope, $q, leafletLogger, leafletHelpers, leafletIterators) {
     var Helpers = leafletHelpers;
     var isString = leafletHelpers.isString;
     var isObject = leafletHelpers.isObject;
@@ -7,6 +7,7 @@ angular.module("leaflet-directive")
     var isDefined = leafletHelpers.isDefined;
     var errorHeader = leafletHelpers.errorHeader;
     var $it = leafletIterators;
+    var $log = leafletLogger;
 
     var utfGridCreateLayer = function(params) {
         if (!Helpers.UTFGridPlugin.isLoaded()) {
@@ -80,6 +81,16 @@ angular.module("leaflet-directive")
                 });
             }
         },
+        geoJSONVectorMarker: {
+            mustHaveUrl: false,
+            createLayer: function(params) {
+                    return new L.geoJson(params.data, {
+                        pointToLayer: function (feature, latlng) {
+                            return L.marker(latlng, {icon: L.VectorMarkers.icon(params.icon)});
+                    }
+                });
+            }
+        },
         utfGrid: {
             mustHaveUrl: true,
             createLayer: utfGridCreateLayer
@@ -144,6 +155,18 @@ angular.module("leaflet-directive")
                 $it.each(params.options.layers, function(l){
                   lyrs.push(createLayer(l));
                 });
+                params.options.loadedDefer = function() {
+                    var defers = [];
+                    if(isDefined(params.options.layers)) {
+                        for (var i = 0; i < params.options.layers.length; i++) {
+                            var d = params.options.layers[i].layerOptions.loadedDefer;
+                            if(isDefined(d)) {
+                                defers.push(d);
+                            }
+                        }
+                    }
+                    return defers;
+                };
                 return L.layerGroup(lyrs);
             }
         },
@@ -163,6 +186,16 @@ angular.module("leaflet-directive")
                 return new L.Google(type, params.options);
             }
         },
+        here: {
+            mustHaveUrl: false,
+            createLayer: function(params) {
+                var provider = params.provider || 'HERE.terrainDay';
+                if (!Helpers.LeafletProviderPlugin.isLoaded()) {
+                    return;
+                }
+                return new L.TileLayer.Provider(provider, params.options);
+            }
+        },            
         china:{
             mustHaveUrl:false,
             createLayer:function(params){
@@ -210,10 +243,22 @@ angular.module("leaflet-directive")
                     $log.warn(errorHeader + ' The esri plugin is not loaded.');
                     return;
                 }
-                
+
                 params.options.url = params.url;
-                
-                return L.esri.featureLayer(params.options);
+
+                var layer = L.esri.featureLayer(params.options);
+                var load = function() {
+                    if(isDefined(params.options.loadedDefer)) {
+                        params.options.loadedDefer.resolve();
+                    }
+                };
+                layer.on('loading', function() {
+                    params.options.loadedDefer = $q.defer();
+                    layer.off('load', load);
+                    layer.on('load', load);
+                });
+
+                return layer;
             }
         },
         agsTiled: {
@@ -223,9 +268,9 @@ angular.module("leaflet-directive")
                     $log.warn(errorHeader + ' The esri plugin is not loaded.');
                     return;
                 }
-                
+
                 params.options.url = params.url;
-                
+
                 return L.esri.tiledMapLayer(params.options);
             }
         },
@@ -236,9 +281,9 @@ angular.module("leaflet-directive")
                     $log.warn(errorHeader + ' The esri plugin is not loaded.');
                     return;
                 }
-                
+
                 params.options.url = params.url;
-                
+
                 return L.esri.dynamicMapLayer(params.options);
             }
         },
@@ -250,7 +295,7 @@ angular.module("leaflet-directive")
                     return;
                 }
                  params.options.url = params.url;
-                
+
                 return L.esri.imageMapLayer(params.options);
             }
         },
@@ -353,6 +398,12 @@ angular.module("leaflet-directive")
             mustHaveBounds : true,
             createLayer: function(params) {
                 return L.imageOverlay(params.url, params.bounds, params.options);
+            }
+        },
+        iip: {
+            mustHaveUrl: true,
+            createLayer: function(params) {
+                return L.tileLayer.iip(params.url, params.options);
             }
         },
 
@@ -459,7 +510,47 @@ angular.module("leaflet-directive")
         return layerTypes[layerDefinition.type].createLayer(params);
     }
 
+    function safeAddLayer(map, layer) {
+        if (layer && typeof layer.addTo === 'function') {
+            layer.addTo(map);
+        } else {
+            map.addLayer(layer);
+        }
+    }
+
+    function safeRemoveLayer(map, layer, layerOptions) {
+        if(isDefined(layerOptions) && isDefined(layerOptions.loadedDefer)) {
+            if(angular.isFunction(layerOptions.loadedDefer)) {
+                var defers = layerOptions.loadedDefer();
+                $log.debug('Loaded Deferred', defers);
+                var count = defers.length;
+                if(count > 0) {
+                    var resolve = function() {
+                        count--;
+                        if(count === 0) {
+                            map.removeLayer(layer);
+                        }
+                    };
+
+                    for(var i = 0; i < defers.length; i++) {
+                        defers[i].promise.then(resolve);
+                    }
+                } else {
+                    map.removeLayer(layer);
+                }
+            } else {
+                layerOptions.loadedDefer.promise.then(function() {
+                    map.removeLayer(layer);
+                });
+            }
+        } else {
+            map.removeLayer(layer);
+        }
+    }
+
     return {
-        createLayer: createLayer
+        createLayer: createLayer,
+        safeAddLayer: safeAddLayer,
+        safeRemoveLayer: safeRemoveLayer
     };
 });

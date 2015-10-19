@@ -1,5 +1,5 @@
 angular.module("leaflet-directive").directive('markers',
-    function ($log, $rootScope, $q, leafletData, leafletHelpers, leafletMapDefaults,
+    function (leafletLogger, $rootScope, $q, leafletData, leafletHelpers, leafletMapDefaults,
               leafletMarkersHelpers, leafletMarkerEvents, leafletIterators, leafletWatchHelpers,
               leafletDirectiveControlsHelpers) {
     //less terse vars to helpers
@@ -16,7 +16,8 @@ angular.module("leaflet-directive").directive('markers',
         $it = leafletIterators,
         _markersWatchOptions = leafletHelpers.watchOptions,
         maybeWatch = leafletWatchHelpers.maybeWatch,
-        extendDirectiveControls = leafletDirectiveControlsHelpers.extend;
+        extendDirectiveControls = leafletDirectiveControlsHelpers.extend,
+        $log = leafletLogger;
 
     var _getLMarker = function(leafletMarkers, name, maybeLayerName){
         if(!Object.keys(leafletMarkers).length) return;
@@ -72,7 +73,7 @@ angular.module("leaflet-directive").directive('markers',
         return true;
     };
     //TODO: move to leafletMarkersHelpers??? or make a new class/function file (leafletMarkersHelpers is large already)
-    var _addMarkers = function(markersToRender, oldModels, map, layers, leafletMarkers, leafletScope,
+    var _addMarkers = function(mapId, markersToRender, oldModels, map, layers, leafletMarkers, leafletScope,
                                watchOptions, maybeLayerName, skips){
         for (var newName in markersToRender) {
             if(skips[newName])
@@ -136,7 +137,7 @@ angular.module("leaflet-directive").directive('markers',
                 }
 
                 listenMarkerEvents(marker, model, leafletScope, watchOptions.individual.doWatch, map);
-                leafletMarkerEvents.bindEvents(marker, pathToMarker, model, leafletScope, layerName);
+                leafletMarkerEvents.bindEvents(mapId, marker, pathToMarker, model, leafletScope, layerName);
             }
             else {
                 var oldModel = isDefined(oldModel)? oldModels[newName] : undefined;
@@ -245,13 +246,13 @@ angular.module("leaflet-directive").directive('markers',
                             $it.each(models, function(markersToAdd, layerName) {
                                 var oldModel = isDefined(oldModel)? oldModels[layerName] : undefined;
                                 skips = _getNewModelsToSkipp(models[layerName], oldModel, leafletMarkers[layerName]);
-                                _addMarkers(markersToAdd, oldModels, map, layers, leafletMarkers, leafletScope,
+                                _addMarkers(attrs.id, markersToAdd, oldModels, map, layers, leafletMarkers, leafletScope,
                                     watchOptions, layerName, skips);
                             });
                             return;
                         }
                         skips = _getNewModelsToSkipp(models, oldModels, leafletMarkers);
-                        _addMarkers(models, oldModels, map, layers, leafletMarkers, leafletScope,
+                        _addMarkers(attrs.id, models, oldModels, map, layers, leafletMarkers, leafletScope,
                             watchOptions, undefined, skips);
                     };
                     extendDirectiveControls(attrs.id, 'markers', _create, _clean);
