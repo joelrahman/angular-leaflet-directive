@@ -49,4 +49,5 @@ We are not limited to one type of layers, we can define other types:
 * WFS Layer.
 * GoogleMaps Layer.
 * MarkerCluster Layer.
-* GeoJSON Layer.
+* GeoJSON Layer,
+* Custom Layer (any existing Leaflet Layer object or a factory function).
